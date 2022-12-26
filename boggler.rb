@@ -1,5 +1,6 @@
-require "trie"
 require "colorize"
+require "io/console"
+require "trie"
 
 DICTIONARY = Trie.new
 File.readlines("collins.txt").each { DICTIONARY.add _1.chomp }
@@ -12,21 +13,20 @@ def search path, word
   solutions = []
   solutions << [path, word] if DICTIONARY.has_key? word
   return solutions if DICTIONARY.children(word).empty?
-  solutions += (DIRECTIONS.map { path.last + _1 } - path)
+  solutions + (DIRECTIONS.map { path.last + _1 } - path)
     .intersection(BOARD.keys)
     .flat_map { search(path + [_1], word + BOARD[_1]) }
-  solutions
 end
 
 def highlight path, word
-  canvas = BOARD.clone
-  path.each do |point|
-    canvas[point] = canvas[point].colorize(:green)
+  canvas = BOARD.transform_values { _1.ljust 2 }
+  path.each.with_index 1 do |point, n|
+    canvas[point] = n.to_s.ljust(2).colorize :green
   end
-  word + "\n\n" + canvas.values.each_slice(4).map { _1.join(" ") }.join("\n")
+  word + "\n\n" + canvas.values.each_slice(4).map { _1.join " " }.join("\n")
 end
 
-BOARD.keys
+solutions = BOARD.keys
   .flat_map { search [_1], BOARD[_1] }
   .reject { _1.last.length < 3 }
   .uniq(&:last)
