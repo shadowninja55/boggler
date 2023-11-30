@@ -31,4 +31,10 @@ solutions = BOARD.keys
   .reject { _1.last.length < 3 }
   .uniq(&:last)
   .sort_by { _1.last.length }
-  .each { puts highlight(*_1) + "\n\n" }
+  .reverse
+height = `tput lines`.to_i
+solutions.each_slice(height / 7) do |slice|
+  $stdout.clear_screen
+  print slice.map { highlight(*_1) }.join "\n\n"
+  exit if $stdin.getch == "\x03"
+end
