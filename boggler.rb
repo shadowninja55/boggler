@@ -2,9 +2,7 @@ require "colorize"
 require "io/console"
 require "trie"
 
-DICTIONARY = Trie.new
-File.readlines("collins.txt").each { DICTIONARY.add _1.chomp }
-
+DICTIONARY = Trie.read "collins"
 print "letters: "
 BOARD = gets.chomp.chars.map.with_index { |c, i| [Complex(i % 4, i / 4), c] }.to_h
 DIRECTIONS = [0-1i, 1-1i, 1+0i, 1+1i, 0+1i, -1+1i, -1+0i, -1-1i]
